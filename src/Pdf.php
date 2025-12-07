@@ -56,7 +56,7 @@ class Pdf
             try {
                 $createdAt = new DateTimeImmutable($data['created_at']);
             } catch (\Exception $e) {
-                throw new InvalidArgumentException('Invalid created_at format: '.$data['created_at']);
+                throw new InvalidArgumentException('Invalid created_at format: ' . $data['created_at']);
             }
         }
 

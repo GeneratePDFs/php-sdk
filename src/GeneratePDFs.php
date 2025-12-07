@@ -197,7 +197,7 @@ class GeneratePDFs
     {
         $response = $this->client->get($downloadUrl, [
             'headers' => [
-                'Authorization' => 'Bearer '.$this->apiToken,
+                'Authorization' => 'Bearer ' . $this->apiToken,
             ],
         ]);
 
@@ -216,7 +216,7 @@ class GeneratePDFs
     {
         $response = $this->client->post($endpoint, [
             'headers' => [
-                'Authorization' => 'Bearer '.$this->apiToken,
+                'Authorization' => 'Bearer ' . $this->apiToken,
                 'Content-Type' => 'application/json',
             ],
             'json' => $data,
