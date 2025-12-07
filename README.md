@@ -1,6 +1,6 @@
 # GeneratePDFs PHP SDK
 
-PHP SDK for the GeneratePDFs.com API. Easily generate PDFs from HTML files or URLs.
+PHP SDK for the [GeneratePDFs.com](https://generatepdfs.com) API. Easily generate PDFs from HTML files or URLs.
 
 ## Installation
 
@@ -95,7 +95,37 @@ if ($pdf->isReady()) {
 - PHP 8.1 or higher
 - Guzzle HTTP Client 7.0 or higher
 
+## Testing
+
+To run the test suite and code style checker, execute:
+
+```bash
+composer test
+```
+
+This will run both PHP CodeSniffer (PSR-2 standard) and Pest tests.
+
+## Contributing
+
+Contributions and suggestions are **welcome** and will be fully **credited**.
+
+We accept contributions via Pull Requests on [GitHub](https://github.com/GeneratePDFs/php-sdk).
+
+### Pull Requests
+
+- **[PSR-12 Extended Coding Standard](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-12-extended-coding-style-guide.md)** - The easiest way to apply the conventions is to install [PHP Code Sniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer/).
+- **Add tests!** - Your patch won't be accepted if it doesn't have tests.
+- **Document any change in behaviour** - Make sure the README / CHANGELOG and any other relevant documentation are kept up-to-date.
+- **Consider our release cycle** - We try to follow semver. Randomly breaking public APIs is not an option.
+- **Create topic branches** - Don't ask us to pull from your master branch.
+- **One pull request per feature** - If you want to do more than one thing, send multiple pull requests.
+- **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please squash them before submitting.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
+
 ## License
 
-MIT
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 

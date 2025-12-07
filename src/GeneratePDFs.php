@@ -227,4 +227,3 @@ class GeneratePDFs
         return json_decode($body, true) ?? [];
     }
 }
-

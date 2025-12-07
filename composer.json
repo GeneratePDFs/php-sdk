@@ -16,7 +16,8 @@
     "require-dev": {
         "pestphp/pest": "^2.0",
         "phpstan/phpstan": "^1.10",
-        "mockery/mockery": "^1.6"
+        "mockery/mockery": "^1.6",
+        "squizlabs/php_codesniffer": "^3.7"
     },
     "autoload": {
         "psr-4": {
@@ -29,7 +30,10 @@
         }
     },
     "scripts": {
-        "test": "pest"
+        "test": [
+            "./vendor/bin/phpcs --standard=PSR12 src",
+            "./vendor/bin/pest"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
