@@ -65,8 +65,7 @@ test('generateFromHtml successfully generates PDF from HTML file', function () {
 
     $mockClient = Mockery::mock(Client::class);
     $mockResponse = new Response(200, [], json_encode([
-        'success' => true,
-        'pdf' => [
+        'data' => [
             'id' => 123,
             'name' => 'test.pdf',
             'status' => 'pending',
@@ -112,8 +111,7 @@ test('generateFromHtml includes CSS when provided', function () {
 
     $mockClient = Mockery::mock(Client::class);
     $mockResponse = new Response(200, [], json_encode([
-        'success' => true,
-        'pdf' => [
+        'data' => [
             'id' => 123,
             'name' => 'test.pdf',
             'status' => 'pending',
@@ -156,8 +154,7 @@ test('generateFromHtml includes images when provided', function () {
 
     $mockClient = Mockery::mock(Client::class);
     $mockResponse = new Response(200, [], json_encode([
-        'success' => true,
-        'pdf' => [
+        'data' => [
             'id' => 123,
             'name' => 'test.pdf',
             'status' => 'pending',
@@ -204,8 +201,7 @@ test('generateFromHtml throws exception when API response is invalid', function 
 
     $mockClient = Mockery::mock(Client::class);
     $mockResponse = new Response(200, [], json_encode([
-        'success' => true,
-        // Missing 'pdf' key
+        // Missing 'data' key
     ]));
 
     $mockClient->shouldReceive('post')
@@ -219,7 +215,7 @@ test('generateFromHtml throws exception when API response is invalid', function 
     $clientProperty->setValue($client, $mockClient);
 
     expect(fn () => $client->generateFromHtml($htmlFile))
-        ->toThrow(InvalidArgumentException::class, 'Invalid API response: missing pdf data');
+        ->toThrow(InvalidArgumentException::class, 'Invalid API response: missing data');
 
     @unlink($htmlFile);
 });
@@ -234,8 +230,7 @@ test('generateFromUrl throws exception for invalid URL', function () {
 test('generateFromUrl successfully generates PDF from URL', function () {
     $mockClient = Mockery::mock(Client::class);
     $mockResponse = new Response(200, [], json_encode([
-        'success' => true,
-        'pdf' => [
+        'data' => [
             'id' => 456,
             'name' => 'url-example.com-2024-01-01-12-00-00.pdf',
             'status' => 'pending',
@@ -319,5 +314,71 @@ test('generateFromHtml handles Guzzle exceptions', function () {
         ->toThrow(ClientException::class);
 
     @unlink($htmlFile);
+});
+
+test('getPdf throws exception for invalid ID', function () {
+    $client = GeneratePDFs::connect($this->apiToken);
+
+    expect(fn () => $client->getPdf(0))
+        ->toThrow(InvalidArgumentException::class, 'Invalid PDF ID: 0');
+
+    expect(fn () => $client->getPdf(-1))
+        ->toThrow(InvalidArgumentException::class, 'Invalid PDF ID: -1');
+});
+
+test('getPdf successfully retrieves PDF by ID', function () {
+    $mockClient = Mockery::mock(Client::class);
+    $mockResponse = new Response(200, [], json_encode([
+        'data' => [
+            'id' => 789,
+            'name' => 'retrieved.pdf',
+            'status' => 'completed',
+            'download_url' => 'https://api.generatepdfs.com/pdfs/789/download/token',
+            'created_at' => '2024-01-01T12:00:00.000000Z',
+        ],
+    ]));
+
+    $mockClient->shouldReceive('get')
+        ->once()
+        ->with(
+            '/pdfs/789',
+            Mockery::on(function ($options) {
+                return isset($options['headers']['Authorization']);
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $client = GeneratePDFs::connect($this->apiToken);
+    $reflection = new ReflectionClass($client);
+    $clientProperty = $reflection->getProperty('client');
+    $clientProperty->setAccessible(true);
+    $clientProperty->setValue($client, $mockClient);
+
+    $pdf = $client->getPdf(789);
+
+    expect($pdf)->toBeInstanceOf(Pdf::class)
+        ->and($pdf->getId())->toBe(789)
+        ->and($pdf->getName())->toBe('retrieved.pdf')
+        ->and($pdf->getStatus())->toBe('completed');
+});
+
+test('getPdf throws exception when API response is invalid', function () {
+    $mockClient = Mockery::mock(Client::class);
+    $mockResponse = new Response(200, [], json_encode([
+        // Missing 'data' key
+    ]));
+
+    $mockClient->shouldReceive('get')
+        ->once()
+        ->andReturn($mockResponse);
+
+    $client = GeneratePDFs::connect($this->apiToken);
+    $reflection = new ReflectionClass($client);
+    $clientProperty = $reflection->getProperty('client');
+    $clientProperty->setAccessible(true);
+    $clientProperty->setValue($client, $mockClient);
+
+    expect(fn () => $client->getPdf(123))
+        ->toThrow(InvalidArgumentException::class, 'Invalid API response: missing data');
 });
 

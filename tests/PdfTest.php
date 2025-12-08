@@ -246,3 +246,58 @@ test('fromArray handles different status values', function () {
     }
 });
 
+test('refresh successfully updates PDF data', function () {
+    $initialData = [
+        'id' => 123,
+        'name' => 'test.pdf',
+        'status' => 'pending',
+        'download_url' => 'https://api.generatepdfs.com/pdfs/123/download/token',
+        'created_at' => '2024-01-01T12:00:00.000000Z',
+    ];
+
+    $pdf = Pdf::fromArray($initialData, $this->client);
+
+    // Mock the client's getPdf method
+    $mockClient = Mockery::mock(Client::class);
+    $mockResponse = new Response(200, [], json_encode([
+        'data' => [
+            'id' => 123,
+            'name' => 'test.pdf',
+            'status' => 'completed',
+            'download_url' => 'https://api.generatepdfs.com/pdfs/123/download/new-token',
+            'created_at' => '2024-01-01T12:00:00.000000Z',
+        ],
+    ]));
+
+    $mockClient->shouldReceive('get')
+        ->once()
+        ->with(
+            '/pdfs/123',
+            Mockery::on(function ($options) {
+                return isset($options['headers']['Authorization']);
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $client = GeneratePDFs::connect('test-token');
+    $reflection = new ReflectionClass($client);
+    $clientProperty = $reflection->getProperty('client');
+    $clientProperty->setAccessible(true);
+    $clientProperty->setValue($client, $mockClient);
+
+    // Create a new PDF with the mocked client
+    $pdf = Pdf::fromArray($initialData, $client);
+
+    // Verify initial state
+    expect($pdf->getStatus())->toBe('pending');
+
+    // Refresh the PDF
+    $refreshedPdf = $pdf->refresh();
+
+    // Verify refreshed state
+    expect($refreshedPdf)->toBeInstanceOf(Pdf::class)
+        ->and($refreshedPdf->getId())->toBe(123)
+        ->and($refreshedPdf->getStatus())->toBe('completed')
+        ->and($refreshedPdf->getDownloadUrl())->toBe('https://api.generatepdfs.com/pdfs/123/download/new-token');
+});
+

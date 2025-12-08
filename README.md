@@ -63,6 +63,13 @@ $pdf = $client->generateFromHtml(
 $pdf = $client->generateFromUrl('https://example.com');
 ```
 
+### Get PDF by ID
+
+```php
+// Retrieve a PDF by its ID
+$pdf = $client->getPdf(123);
+```
+
 ### Working with PDF Objects
 
 The SDK returns `Pdf` objects that provide easy access to PDF information and downloading:
@@ -83,7 +90,20 @@ if ($pdf->isReady()) {
     // Or save directly to file
     $pdf->downloadToFile('/path/to/save/output.pdf');
 }
+
+// Refresh PDF data from the API (useful for checking status updates)
+$refreshedPdf = $pdf->refresh();
+if ($refreshedPdf->isReady()) {
+    $pdfContent = $refreshedPdf->download();
+}
 ```
+
+### Client Methods
+
+- `generateFromHtml(string $htmlPath, ?string $cssPath = null, array $images = []): Pdf` - Generate a PDF from HTML file(s)
+- `generateFromUrl(string $url): Pdf` - Generate a PDF from a URL
+- `getPdf(int $id): Pdf` - Retrieve a PDF by its ID
+- `downloadPdf(string $downloadUrl): string` - Download PDF binary content from a download URL
 
 ### PDF Object Methods
 
@@ -95,6 +115,7 @@ if ($pdf->isReady()) {
 - `isReady(): bool` - Check if the PDF is ready for download
 - `download(): string` - Download and return PDF binary content
 - `downloadToFile(string $filePath): bool` - Download and save PDF to a file
+- `refresh(): Pdf` - Refresh PDF data from the API and return a new Pdf instance with updated information
 
 ## Requirements
 

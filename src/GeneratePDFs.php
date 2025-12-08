@@ -75,11 +75,11 @@ class GeneratePDFs
 
         $response = $this->makeRequest('/pdfs/generate', $data);
 
-        if (! isset($response['pdf'])) {
-            throw new InvalidArgumentException('Invalid API response: missing pdf data');
+        if (! isset($response['data'])) {
+            throw new InvalidArgumentException('Invalid API response: missing data');
         }
 
-        return Pdf::fromArray($response['pdf'], $this);
+        return Pdf::fromArray($response['data'], $this);
     }
 
     /**
@@ -102,11 +102,34 @@ class GeneratePDFs
 
         $response = $this->makeRequest('/pdfs/generate', $data);
 
-        if (! isset($response['pdf'])) {
-            throw new InvalidArgumentException('Invalid API response: missing pdf data');
+        if (! isset($response['data'])) {
+            throw new InvalidArgumentException('Invalid API response: missing data');
         }
 
-        return Pdf::fromArray($response['pdf'], $this);
+        return Pdf::fromArray($response['data'], $this);
+    }
+
+    /**
+     * Get a PDF by its ID.
+     *
+     * @param int $id The PDF ID
+     * @return Pdf PDF object containing PDF information
+     * @throws InvalidArgumentException If ID is invalid
+     * @throws GuzzleException If the HTTP request fails
+     */
+    public function getPdf(int $id): Pdf
+    {
+        if ($id <= 0) {
+            throw new InvalidArgumentException("Invalid PDF ID: {$id}");
+        }
+
+        $response = $this->makeGetRequest("/pdfs/{$id}");
+
+        if (! isset($response['data'])) {
+            throw new InvalidArgumentException('Invalid API response: missing data');
+        }
+
+        return Pdf::fromArray($response['data'], $this);
     }
 
     /**
@@ -205,7 +228,7 @@ class GeneratePDFs
     }
 
     /**
-     * Make an HTTP request to the API.
+     * Make an HTTP POST request to the API.
      *
      * @param string $endpoint API endpoint
      * @param array<string, mixed> $data Request data
@@ -220,6 +243,26 @@ class GeneratePDFs
                 'Content-Type' => 'application/json',
             ],
             'json' => $data,
+        ]);
+
+        $body = (string) $response->getBody();
+
+        return json_decode($body, true) ?? [];
+    }
+
+    /**
+     * Make an HTTP GET request to the API.
+     *
+     * @param string $endpoint API endpoint
+     * @return array<string, mixed> Decoded JSON response
+     * @throws GuzzleException If the HTTP request fails
+     */
+    private function makeGetRequest(string $endpoint): array
+    {
+        $response = $this->client->get($endpoint, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiToken,
+            ],
         ]);
 
         $body = (string) $response->getBody();

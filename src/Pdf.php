@@ -166,4 +166,16 @@ class Pdf
 
         return true;
     }
+
+    /**
+     * Refresh the PDF data from the API.
+     *
+     * @return Pdf A new Pdf instance with updated data
+     * @throws GuzzleException If the HTTP request fails
+     * @throws InvalidArgumentException If the API response is invalid
+     */
+    public function refresh(): Pdf
+    {
+        return $this->client->getPdf($this->id);
+    }
 }
