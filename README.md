@@ -1,12 +1,18 @@
 # GeneratePDFs PHP SDK
 
-PHP SDK for the [GeneratePDFs.com](https://generatepdfs.com) API. Easily generate PDFs from HTML files or URLs.
+PHP SDK for the [GeneratePDFs.com](https://generatepdfs.com) API, your go-to place for HTML to PDF.
+
+Upload your HTML files, along with any CSS files and images to generate a PDF. Alternatively provide a URL to generate a PDF from it's contents.
 
 ## Installation
 
 ```bash
 composer require generatepdfs/php-sdk
 ```
+
+## Get your API Token
+
+Sign up for an account on [GeneratePDFs.com](https://generatepdfs.com) and head to the API Tokens section and create a new token. 
 
 ## Usage
 
